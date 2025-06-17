@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnipURL | Modern URL Shortener</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+        }
+        .url-card {
+            transition: all 0.3s ease;
+        }
+        .url-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .copy-btn {
+            transition: all 0.2s ease;
+        }
+        .copy-btn:hover {
+            background-color: #0c4a6e;
+        }
+        .copy-btn.copied {
+            background-color: #10b981;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-link text-2xl"></i>
+                    <h1 class="text-2xl font-bold">SnipURL</h1>
+                </div>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="{{ url_for('stats') }}" class="hover:underline">Analytics</a></li>
+                        <li><a href="#" class="hover:underline">Features</a></li>
+                        <li><a href="#" class="hover:underline">Pricing</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <section class="max-w-3xl mx-auto text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Shorten Your Links, Amplify Your Reach</h2>
+            <p class="text-xl text-gray-600 mb-8">A modern URL shortener with detailed analytics to track your audience.</p>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                {% if error %}
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700">{{ error }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <form method="POST" class="flex flex-col sm:flex-row gap-4">
+                    <input 
+                        type="text" 
+                        name="url" 
+                        placeholder="Paste your long URL here..." 
+                        class="flex-grow px-5 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        required
+                    >
+                    <button 
+                        type="submit" 
+                        class="px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
+                    >
+                        <i class="fas fa-scissors mr-2"></i> Shorten
+                    </button>
+                </form>
+            </div>
+
+            {% if short_url %}
+            <div class="bg-white rounded-xl shadow-lg p-6 text-left url-card">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex-grow">
+                        <p class="text-sm text-gray-500 mb-1">Your shortened URL</p>
+                        <a 
+                            href="{{ short_url }}" 
+                            target="_blank" 
+                            class="text-primary-600 font-medium break-all hover:underline"
+                            id="short-url"
+                        >
+                            {{ short_url }}
+                        </a>
+                    </div>
+                    <button 
+                        onclick="copyToClipboard('{{ short_url }}')" 
+                        class="copy-btn px-4 py-2 bg-primary-700 text-white rounded-lg flex items-center"
+                        id="copy-btn"
+                    >
+                        <i class="fas fa-copy mr-2"></i> Copy
+                    </button>
+                </div>
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <a 
+                        href="{{ url_for('stats') }}" 
+                        class="text-primary-600 hover:underline flex items-center"
+                    >
+                        <i class="fas fa-chart-line mr-2"></i> View analytics
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="max-w-6xl mx-auto">
+            <h3 class="text-2xl font-bold text-center text-gray-800 mb-12">Why Choose SnipURL?</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                    <div class="text-primary-500 mb-4">
+                        <i class="fas fa-bolt text-3xl"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Lightning Fast</h4>
+                    <p class="text-gray-600">Our global CDN ensures your links redirect instantly, anywhere in the world.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                    <div class="text-primary-500 mb-4">
+                        <i class="fas fa-chart-pie text-3xl"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Detailed Analytics</h4>
+                    <p class="text-gray-600">Track clicks, locations, and devices to understand your audience better.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                    <div class="text-primary-500 mb-4">
+                        <i class="fas fa-lock text-3xl"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Secure Links</h4>
+                    <p class="text-gray-600">All links are encrypted and protected against malicious activity.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-link text-2xl"></i>
+                        <h2 class="text-2xl font-bold">SnipURL</h2>
+                    </div>
+                    <p class="mt-2 text-gray-400">The modern URL shortener you've been waiting for.</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Product</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">Features</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Pricing</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">API</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">Documentation</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Guides</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Company</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">About</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 SnipURL. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copy-btn');
+                btn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-copy mr-2"></i> Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
